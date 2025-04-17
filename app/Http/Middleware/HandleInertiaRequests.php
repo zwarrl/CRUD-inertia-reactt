@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use Tighten\Ziggy\Ziggy;
-
+use Tightenco\Ziggy\Ziggy;
+use Illuminate\Support\Facades\Auth; 
 class HandleInertiaRequests extends Middleware
 {
     /**
@@ -30,6 +30,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = Auth::user();
+
+        if ($user) {
+            $user->load('roles');
+
+            $user = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles,
+            ];
+        }
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
